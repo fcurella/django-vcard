@@ -6,6 +6,7 @@ import vcard
 from django.shortcuts import render_to_response
 from django.conf.urls.defaults import *
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 """
 class NInline(admin.StackedInline):
@@ -123,16 +124,16 @@ class ContactAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(ContactAdmin, self).get_urls()
         my_urls = patterns('',
-            (r'^selectVCF/confirmVCF/uploadVCF/$', self.admin_site.admin_view(self.uploadVCF)),
-            (r'^selectVCF/confirmVCF/$', self.admin_site.admin_view(self.confirmVCF)),
-            (r'^selectVCF/$', self.admin_site.admin_view(self.selectVCF))
+            url(r'^selectVCF/confirmVCF/uploadVCF/$', self.admin_site.admin_view(self.uploadVCF), name="vcard_uploadVCF"),
+            url(r'^selectVCF/confirmVCF/$', self.admin_site.admin_view(self.confirmVCF), name="vcard_confirmVCF"),
+            url(r'^selectVCF/$', self.admin_site.admin_view(self.selectVCF), name="vcard_selectVCF")
         )
         return my_urls + urls
 
     def uploadVCF(self, request):
         """ TODO: Docstring """
         if 'confirm' not in request.REQUEST:
-            return HttpResponseRedirect('/admin/vcard/contact')
+            return HttpResponseRedirect(reverse("admin:vcard_contact_changelist"))
 
         newContactList = request.session['unconfirmedContacts']
 
@@ -140,13 +141,12 @@ class ContactAdmin(admin.ModelAdmin):
 
             i.commit()
 
-        return HttpResponseRedirect('/admin/vcard/contact')
+        return HttpResponseRedirect(reverse("admin:vcard_contact_changelist"))
 
     def confirmVCF(self, request):
         newContactList = []
-
         if 'upfile' not in request.FILES:
-            return HttpResponseRedirect('/admin/vcard/contact/selectVCF/')
+            return HttpResponseRedirect(reverse("admin:vcard_selectVCF"))
 
         try:
             for o in vobject.readComponents(request.FILES['upfile']):
