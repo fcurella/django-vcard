@@ -124,9 +124,21 @@ class ContactAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(ContactAdmin, self).get_urls()
         my_urls = patterns('',
-            url(r'^selectVCF/confirmVCF/uploadVCF/$', self.admin_site.admin_view(self.uploadVCF), name="vcard_uploadVCF"),
-            url(r'^selectVCF/confirmVCF/$', self.admin_site.admin_view(self.confirmVCF), name="vcard_confirmVCF"),
-            url(r'^selectVCF/$', self.admin_site.admin_view(self.selectVCF), name="vcard_selectVCF")
+            url(
+                r'^selectVCF/confirmVCF/uploadVCF/$',
+                self.admin_site.admin_view(self.uploadVCF),
+                name="vcard_uploadVCF"
+            ),
+            url(
+                r'^selectVCF/confirmVCF/$',
+                self.admin_site.admin_view(self.confirmVCF),
+                name="vcard_confirmVCF"
+            ),
+            url(
+                r'^selectVCF/$',
+                self.admin_site.admin_view(self.selectVCF),
+                name="vcard_selectVCF"
+            )
         )
         return my_urls + urls
 
@@ -161,7 +173,9 @@ class ContactAdmin(admin.ModelAdmin):
             for i in newContactList :
                 i.delete()
 
-            return render_to_response('admin/errorVCF.html', {'exception': e}, context_instance=RequestContext(request))
+            return render_to_response('admin/errorVCF.html', {
+                'exception': e
+            }, context_instance=RequestContext(request))
 
         request.session['unconfirmedContacts'] = newContactList
 
@@ -171,7 +185,10 @@ class ContactAdmin(admin.ModelAdmin):
             if len(i.errorList) > 0:
                 errorCount += 1
 
-        return render_to_response('admin/confirmVCF.html', {'contactSet': newContactList, 'errorCount': errorCount}, context_instance=RequestContext(request))
+        return render_to_response('admin/confirmVCF.html', {
+            'contactSet': newContactList,
+            'errorCount': errorCount
+        }, context_instance=RequestContext(request))
 
     def selectVCFLink(self):
         """ TODO: Docstring """
